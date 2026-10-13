@@ -11,3 +11,7 @@
 - Routen `/`, `/devices/new`, `/devices/:id/edit`; App.vue mit Navigation und `<RouterView />`.
 - Platzhalter: DevicesView, DeviceFormView (erkennt Bearbeiten-Modus über `route.params.id`).
 - Konzepte: Vue Router, RouterLink, RouterView, Routenparameter, useRoute, computed, v-if/v-else.
+
+### W2A – Master-Detail mit Testdaten
+- DevicesView: Liste links, Details rechts, aktive Zeile markiert, leerer Zustand.
+- Konzepte: ref, v-for + :key, :class, @click, v-if/v-else, Arrow Functions.
