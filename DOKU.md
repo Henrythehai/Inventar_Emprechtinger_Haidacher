@@ -15,3 +15,8 @@
 ### W2A – Master-Detail mit Testdaten
 - DevicesView: Liste links, Details rechts, aktive Zeile markiert, leerer Zustand.
 - Konzepte: ref, v-for + :key, :class, @click, v-if/v-else, Arrow Functions.
+
+### W2B – Komponenten
+- Neue Komponenten: DeviceList (props: devices, selectedId; emit: select), DeviceDetail (props: device).
+- DevicesView hält die Daten und reicht sie per Props weiter.
+- Konzepte: Komponenten, defineProps, defineEmits, Optional Chaining.
