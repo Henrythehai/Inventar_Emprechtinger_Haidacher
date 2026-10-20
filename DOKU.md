@@ -25,3 +25,8 @@
 - `api.js` mit API_URL; DevicesView lädt Geräte per GET in `onMounted`.
 - Lade- und Fehleranzeige (`isLoading`, `errorMessage`).
 - Konzepte: fetch, async/await, try/catch/finally, response.ok, onMounted, v-else-if.
+
+### W3B – Suche und Filter
+- Suchfeld (Name) und Status-Dropdown; `filteredDevices` als computed.
+- `constants.js` mit CATEGORIES und STATUSES.
+- Konzepte: v-model, computed, v-for bei option, Array.filter.
