@@ -3,8 +3,12 @@
     <!-- MASTER: list of all devices -->
     <section class="master">
       <h2>Geräte</h2>
-      <!-- :prop passes data down, @event listens to the child's emit -->
+
+      <!-- loading and error states for the API request -->
+      <p v-if="isLoading" class="status">Daten werden geladen...</p>
+      <p v-else-if="errorMessage" class="status error">{{ errorMessage }}</p>
       <DeviceList
+        v-else
         :devices="devices"
         :selected-id="selectedDevice?.id"
         @select="selectDevice"
@@ -20,24 +24,50 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { ref, onMounted } from 'vue'
+import { API_URL } from '@/api.js'
 import DeviceList from '@/components/DeviceList.vue'
 import DeviceDetail from '@/components/DeviceDetail.vue'
 
-// mock data for testing (replaced by fetch in week 3)
-const devices = ref([
-  { id: '1', name: 'Lenovo ThinkPad T14', category: 'Laptop', location: 'Raum 204', serialNumber: 'PF3K9A21', status: 'aktiv', purchaseDate: '2023-09-01' },
-  { id: '2', name: 'Dell P2422H', category: 'Monitor', location: 'Raum 204', serialNumber: 'CN0D2X44', status: 'aktiv', purchaseDate: '2022-03-15' },
-  { id: '3', name: 'Epson EB-W49', category: 'Beamer', location: 'Raum 110', serialNumber: 'X4LF120093', status: 'defekt', purchaseDate: '2020-10-05' },
-])
-
-// currently selected device (null = nothing selected)
+// reactive state
+const devices = ref([])
 const selectedDevice = ref(null)
+const isLoading = ref(true)
+const errorMessage = ref('')
+
+// GET all devices from the server
+const fetchDevices = async () => {
+  try {
+    isLoading.value = true
+    errorMessage.value = ''
+
+    const response = await fetch(API_URL)
+
+    // response.ok is true for status 200-299
+    if (!response.ok) {
+      throw new Error(`Server-Fehler: ${response.status}`)
+    }
+
+    // parse JSON and store it in the reactive array
+    devices.value = await response.json()
+  } catch (error) {
+    console.error('Fehler beim Laden:', error)
+    errorMessage.value = 'Die Geräte konnten nicht geladen werden. Läuft der json-server?'
+  } finally {
+    // runs on success AND on error
+    isLoading.value = false
+  }
+}
 
 // called when DeviceList emits "select"
 const selectDevice = (device) => {
   selectedDevice.value = device
 }
+
+// lifecycle hook: load data as soon as the component is mounted
+onMounted(() => {
+  fetchDevices()
+})
 </script>
 
 <style scoped>
@@ -56,7 +86,12 @@ const selectDevice = (device) => {
   border-left: 1px solid #e0e0e0;
 }
 
-.empty {
+.empty,
+.status {
   color: #999;
+}
+
+.error {
+  color: #d32f2f;
 }
 </style>

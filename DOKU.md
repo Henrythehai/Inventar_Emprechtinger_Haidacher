@@ -20,3 +20,8 @@
 - Neue Komponenten: DeviceList (props: devices, selectedId; emit: select), DeviceDetail (props: device).
 - DevicesView hält die Daten und reicht sie per Props weiter.
 - Konzepte: Komponenten, defineProps, defineEmits, Optional Chaining.
+
+### W3A – Daten per fetch laden
+- `api.js` mit API_URL; DevicesView lädt Geräte per GET in `onMounted`.
+- Lade- und Fehleranzeige (`isLoading`, `errorMessage`).
+- Konzepte: fetch, async/await, try/catch/finally, response.ok, onMounted, v-else-if.
