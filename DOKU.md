@@ -39,3 +39,14 @@
 - Regeln: Pflichtfelder, Seriennummer ≥ 5 Zeichen, Kaufdatum nicht in der Zukunft.
 - `errors` und `isValid` als computed, Anzeige nach erstem Speichern-Versuch (`submitted`).
 - Konzepte: Formular-Validierung, computed, v-if.
+
+### W5A – Bearbeiten
+- DeviceDetail: Link „Bearbeiten“ → `/devices/:id/edit`.
+- DeviceFormView lädt Gerät per GET by id, speichert per PUT (neu weiterhin POST).
+- `watch` auf `route.params.id`, weil Vue die Komponente zwischen /new und /:id/edit wiederverwendet.
+- Konzepte: Routenparameter, fetch GET by id, PUT, watch (immediate), :to, Destructuring/Spread.
+
+### W5B – Löschen
+- DeviceDetail: Button „Löschen“ → `emit('delete', device)`.
+- DevicesView: `deleteDevice` mit confirm, DELETE-Request, lokales Entfernen per filter, `actionError`.
+- Konzepte: Emits mit Parameter, fetch DELETE, Array.filter.

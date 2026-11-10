@@ -29,7 +29,8 @@
 
     <!-- DETAIL: the selected device -->
     <section class="detail">
-      <DeviceDetail v-if="selectedDevice" :device="selectedDevice" />
+      <p v-if="actionError" class="status error">{{ actionError }}</p>
+      <DeviceDetail v-if="selectedDevice" :device="selectedDevice" @delete="deleteDevice" />
       <p v-else class="empty">Wähle links ein Gerät aus, um die Details zu sehen.</p>
     </section>
   </div>
@@ -49,6 +50,7 @@ const isLoading = ref(true)
 const errorMessage = ref('')
 const search = ref('')
 const statusFilter = ref('')
+const actionError = ref('') // error for delete (and later status change)
 
 // computed: recalculated automatically when devices, search or statusFilter change
 const filteredDevices = computed(() => {
@@ -82,6 +84,31 @@ const fetchDevices = async () => {
   } finally {
     // runs on success AND on error
     isLoading.value = false
+  }
+}
+
+// DELETE: called when DeviceDetail emits "delete"
+const deleteDevice = async (device) => {
+  // confirm() shows a yes/no dialog in the browser
+  if (!confirm(`Gerät "${device.name}" wirklich löschen?`)) {
+    return
+  }
+
+  try {
+    actionError.value = ''
+
+    const response = await fetch(`${API_URL}/${device.id}`, { method: 'DELETE' })
+
+    if (!response.ok) {
+      throw new Error(`Server-Fehler: ${response.status}`)
+    }
+
+    // remove the device from the local array (no need to reload everything)
+    devices.value = devices.value.filter((d) => d.id !== device.id)
+    selectedDevice.value = null
+  } catch (error) {
+    console.error('Fehler beim Löschen:', error)
+    actionError.value = 'Das Gerät konnte nicht gelöscht werden.'
   }
 }
 
