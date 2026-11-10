@@ -8,6 +8,7 @@
       <label>
         Name
         <input v-model.trim="form.name" type="text" />
+        <small v-if="submitted && errors.name" class="error">{{ errors.name }}</small>
       </label>
 
       <label>
@@ -18,16 +19,19 @@
             {{ category }}
           </option>
         </select>
+        <small v-if="submitted && errors.category" class="error">{{ errors.category }}</small>
       </label>
 
       <label>
         Standort
         <input v-model.trim="form.location" type="text" />
+        <small v-if="submitted && errors.location" class="error">{{ errors.location }}</small>
       </label>
 
       <label>
         Seriennummer
         <input v-model.trim="form.serialNumber" type="text" />
+        <small v-if="submitted && errors.serialNumber" class="error">{{ errors.serialNumber }}</small>
       </label>
 
       <label>
@@ -42,6 +46,7 @@
       <label>
         Kaufdatum
         <input v-model="form.purchaseDate" type="date" />
+        <small v-if="submitted && errors.purchaseDate" class="error">{{ errors.purchaseDate }}</small>
       </label>
 
       <p v-if="errorMessage" class="error">{{ errorMessage }}</p>
@@ -80,8 +85,49 @@ const form = reactive({
 const isSaving = ref(false)
 const errorMessage = ref('')
 
+// errors are only shown after the first click on "Speichern"
+const submitted = ref(false)
+
+// today as "YYYY-MM-DD", same format as the date input
+const today = new Date().toISOString().slice(0, 10)
+
+// computed: validation rules, recalculated on every input
+const errors = computed(() => {
+  const result = {}
+
+  if (form.name === '') {
+    result.name = 'Name ist ein Pflichtfeld.'
+  }
+  if (form.category === '') {
+    result.category = 'Bitte eine Kategorie wählen.'
+  }
+  if (form.location === '') {
+    result.location = 'Standort ist ein Pflichtfeld.'
+  }
+  if (form.serialNumber.length < 5) {
+    result.serialNumber = 'Die Seriennummer braucht mindestens 5 Zeichen.'
+  }
+  if (form.purchaseDate === '') {
+    result.purchaseDate = 'Kaufdatum ist ein Pflichtfeld.'
+  } else if (form.purchaseDate > today) {
+    result.purchaseDate = 'Das Kaufdatum darf nicht in der Zukunft liegen.'
+  }
+
+  return result
+})
+
+// valid when there is no error message
+const isValid = computed(() => Object.keys(errors.value).length === 0)
+
 // POST: create a new device on the server
 const saveDevice = async () => {
+  submitted.value = true
+
+  // stop here if the form is not valid
+  if (!isValid.value) {
+    return
+  }
+
   try {
     isSaving.value = true
     errorMessage.value = ''
@@ -133,5 +179,6 @@ label {
 .error {
   margin: 0;
   color: #d32f2f;
+  font-size: 0.85rem;
 }
 </style>

@@ -34,3 +34,8 @@
 ### W4A – Formular und Anlegen
 - DeviceFormView mit Formular (reactive), Speichern per POST, danach `router.push('/')`.
 - Konzepte: reactive, v-model (.trim) bei input/select/date, @submit.prevent, fetch POST, :disabled, useRouter.
+
+### W4B – Validierung
+- Regeln: Pflichtfelder, Seriennummer ≥ 5 Zeichen, Kaufdatum nicht in der Zukunft.
+- `errors` und `isValid` als computed, Anzeige nach erstem Speichern-Versuch (`submitted`).
+- Konzepte: Formular-Validierung, computed, v-if.
