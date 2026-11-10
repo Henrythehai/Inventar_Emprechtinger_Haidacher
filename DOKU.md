@@ -30,3 +30,7 @@
 - Suchfeld (Name) und Status-Dropdown; `filteredDevices` als computed.
 - `constants.js` mit CATEGORIES und STATUSES.
 - Konzepte: v-model, computed, v-for bei option, Array.filter.
+
+### W4A – Formular und Anlegen
+- DeviceFormView mit Formular (reactive), Speichern per POST, danach `router.push('/')`.
+- Konzepte: reactive, v-model (.trim) bei input/select/date, @submit.prevent, fetch POST, :disabled, useRouter.
