@@ -50,3 +50,13 @@
 - DeviceDetail: Button „Löschen“ → `emit('delete', device)`.
 - DevicesView: `deleteDevice` mit confirm, DELETE-Request, lokales Entfernen per filter, `actionError`.
 - Konzepte: Emits mit Parameter, fetch DELETE, Array.filter.
+
+### W6A – Status ändern
+- DeviceDetail: Status-Badge (farbig per :class) und Status-Buttons → `emit('change-status', device, status)`.
+- DevicesView: `changeStatus` mit PATCH, ersetzt das Gerät im Array.
+- Konzepte: fetch PATCH, :class (Array-Syntax), :disabled, Emit mit mehreren Parametern.
+
+### W6B – Statistik und watch
+- Neue Komponente DeviceStats (props: devices; computed countsByStatus), ein-/ausblendbar mit v-show.
+- watch auf filteredDevices: Auswahl wird aufgehoben, wenn das Gerät ausgefiltert wird.
+- Konzepte: v-show vs. v-if, computed mit Props, watch.

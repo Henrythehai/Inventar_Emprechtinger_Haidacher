@@ -4,6 +4,12 @@
     <section class="master">
       <h2>Geräte</h2>
 
+      <!-- v-show only hides the element with CSS, it stays in the DOM -->
+      <button type="button" @click="showStats = !showStats">
+        {{ showStats ? 'Statistik ausblenden' : 'Statistik anzeigen' }}
+      </button>
+      <DeviceStats v-show="showStats" :devices="devices" />
+
       <!-- search and filter: v-model binds the inputs to refs -->
       <div class="toolbar">
         <input v-model="search" type="search" placeholder="Suche nach Name..." />
@@ -30,18 +36,24 @@
     <!-- DETAIL: the selected device -->
     <section class="detail">
       <p v-if="actionError" class="status error">{{ actionError }}</p>
-      <DeviceDetail v-if="selectedDevice" :device="selectedDevice" @delete="deleteDevice" />
+      <DeviceDetail
+        v-if="selectedDevice"
+        :device="selectedDevice"
+        @delete="deleteDevice"
+        @change-status="changeStatus"
+      />
       <p v-else class="empty">Wähle links ein Gerät aus, um die Details zu sehen.</p>
     </section>
   </div>
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed, watch, onMounted } from 'vue'
 import { API_URL } from '@/api.js'
 import { STATUSES } from '@/constants.js'
 import DeviceList from '@/components/DeviceList.vue'
 import DeviceDetail from '@/components/DeviceDetail.vue'
+import DeviceStats from '@/components/DeviceStats.vue'
 
 // reactive state
 const devices = ref([])
@@ -50,7 +62,8 @@ const isLoading = ref(true)
 const errorMessage = ref('')
 const search = ref('')
 const statusFilter = ref('')
-const actionError = ref('') // error for delete (and later status change)
+const actionError = ref('') // error for delete and status change
+const showStats = ref(false)
 
 // computed: recalculated automatically when devices, search or statusFilter change
 const filteredDevices = computed(() => {
@@ -61,6 +74,14 @@ const filteredDevices = computed(() => {
     const matchesStatus = statusFilter.value === '' || device.status === statusFilter.value
     return matchesSearch && matchesStatus
   })
+})
+
+// watch: when the filtered list changes and the selected device is no longer
+// in it (filtered out), clear the selection
+watch(filteredDevices, (newList) => {
+  if (selectedDevice.value && !newList.some((d) => d.id === selectedDevice.value.id)) {
+    selectedDevice.value = null
+  }
 })
 
 // GET all devices from the server
@@ -112,6 +133,34 @@ const deleteDevice = async (device) => {
   }
 }
 
+// PATCH: only change the status of one device
+const changeStatus = async (device, status) => {
+  try {
+    actionError.value = ''
+
+    const response = await fetch(`${API_URL}/${device.id}`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ status: status }),
+    })
+
+    if (!response.ok) {
+      throw new Error(`Server-Fehler: ${response.status}`)
+    }
+
+    // the server returns the updated device
+    const updatedDevice = await response.json()
+
+    // replace the old device in the array -> list and detail update automatically
+    const index = devices.value.findIndex((d) => d.id === updatedDevice.id)
+    devices.value[index] = updatedDevice
+    selectedDevice.value = updatedDevice
+  } catch (error) {
+    console.error('Fehler beim Ändern des Status:', error)
+    actionError.value = 'Der Status konnte nicht geändert werden.'
+  }
+}
+
 // called when DeviceList emits "select"
 const selectDevice = (device) => {
   selectedDevice.value = device
@@ -142,7 +191,7 @@ onMounted(() => {
 .toolbar {
   display: flex;
   gap: 8px;
-  margin-bottom: 12px;
+  margin: 12px 0;
 }
 
 .toolbar input {
